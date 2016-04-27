@@ -552,11 +552,19 @@ class tx_cwmobileredirect
     protected function setHttpStatus()
     {
         // set default HTTP Status code, if not defined
-        if ('' == $this->_conf['httpStatus'] || !defined('t3lib_utility_Http::'. $this->_conf['httpStatus'])) {
-            $this->_conf['httpStatus'] = t3lib_utility_Http::HTTP_STATUS_303;
-        } else {
-            $this->_conf['httpStatus'] = constant('t3lib_utility_Http::'. $this->_conf['httpStatus']);
+        $status = t3lib_utility_Http::HTTP_STATUS_303;
+        
+        // apply http_status config setting if available
+        if ('' != $this->_conf['http_status'] && defined('t3lib_utility_Http::'. $this->_conf['http_status'])) {
+            $status = constant('t3lib_utility_Http::'. $this->_conf['http_status']);
         }
+        
+        // override with httpStatus if available
+        if ('' != $this->_conf['httpStatus'] && defined('t3lib_utility_Http::'. $this->_conf['httpStatus'])) {
+            $status = constant('t3lib_utility_Http::'. $this->_conf['httpStatus']);
+        }
+        
+        $this->_conf['httpStatus'] = $status;
 
         $this->debugLog('Setting HTTP status', array('http_status' => $this->_conf['httpStatus']));
     }
